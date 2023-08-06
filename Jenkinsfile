@@ -10,6 +10,15 @@ pipeline {
     //{
     // some block
 }
+
+environment {
+        AWS_ACCESS_KEY_ID = credentials('aws-key').accessKey
+        AWS_SECRET_ACCESS_KEY = credentials('aws-key').secretKey
+        ECR_REPOSITORY = 'your-ecr-repository-url'
+        DOCKER_TAG = 'latest'
+        HELM_CHART_DIR = 'signup-chart'
+    }
+
     // }
     stages {
         stage('Checkout') {
@@ -33,23 +42,28 @@ pipeline {
 
         stage('helmChart tag') {
             steps {
-                // bat "sed -i 's|nusair/signup-image:v1|nusair/signup-image:${env.BUILD_NUMBER}|g' ./signup-chart/values.yaml"
-                bat """
-                powershell.exe -Command "((Get-Content -Path './signup-chart/values.yaml') -replace 'nusair/signup-image:v1', 'nusair/signup-image:${env.BUILD_NUMBER}') | Set-Content -Path './signup-chart/values.yaml'"
-                """
-            }
-        }
-        
-        stage('helm package ') {
-            steps {
-                bat "\"C:\\Program Files\\windows-amd64\\helm\" package E:\\Signup-pro\\registration\\signup-chart"
-                // bat 'wsl /usr/local/bin/helm package signup-chart
-                // bat 'wsl helm package signup-chart'
-                // bat 'wsl sudo helm package signup-chart'
-                
+                sh "sed -i 's|nusair/signup-image:v1|${ECR_REPOSITORY}:${DOCKER_TAG}|g' $HELM_CHART_DIR/values.yaml"
             }
         }
 
+        stage('helm package') {
+            steps {
+                sh "helm package $HELM_CHART_DIR"
+            }
+        }
+
+        stage('Logging into AWS ECR & push helm chart to ECR') {
+            steps {
+                withAWS(credentials: 'aws-key', region: 'us-east-1') {
+                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY"
+                    sh "helm registry login -u AWS -p $(aws ecr get-login-password --region us-east-1) 947437598996.dkr.ecr.us-east-1.amazonaws.com"
+                    sh "helm push $HELM_CHART_DIR-0.1.0.tgz oci://947437598996.dkr.ecr.us-east-1.amazonaws.com"
+                    sh "rm $HELM_CHART_DIR-0.1.0.tgz"
+                }
+            }
+        }
+
+       
         stage('Logging into AWS ECR & push helm chart to ECR') {
             steps {
                 withCredentials([aws(credentialsId: 'aws-key', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
