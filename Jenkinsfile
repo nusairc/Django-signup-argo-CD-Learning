@@ -7,36 +7,25 @@ pipeline {
     //     IMAGE_REPO_NAME="signup-chart"
     //     IMAGE_TAG="latest"
     //     REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
+    //{
+    // some block
+}
     // }
     stages {
         stage('Checkout') {
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-key', url: 'https://github.com/nusairc/signup-helm.git']])
-            }
-        }
-        stage('Python Build') {
-            steps {
-                dir('./registration'){    
-                 bat 'python settings.py build'
-                }
-            }}
-
-       stage('Unit Test') {
-            steps {
-                dir('./registration/app1') {
-                    bat 'python ../../manage.py test'
-                }
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-key', url: 'https://github.com/nusairc/signup-argo.git']])
             }
         }
 
             
         stage('Docker Login and Build') {
             steps {
-                withCredentials([string(credentialsId: 'nusair', variable: 'docker-var')]) {
-                    bat 'docker login -u nusair -p %docker-var%'
-                    bat "docker build -t nusair/signup-image:${env.BUILD_NUMBER} . "
-                    bat "docker push nusair/signup-image:${env.BUILD_NUMBER}"
-                    bat 'docker logout'
+               withCredentials([usernamePassword(credentialsId: 'docker-key', passwordVariable: 'docker-pass', usernameVariable: 'docker-user')]) {
+                    sh 'docker login -u %docker-user% -p %docker-pass%'
+                    sh "docker build -t nusair/signup-image:${env.BUILD_NUMBER} . "
+                    sh "docker push nusair/signup-image:${env.BUILD_NUMBER}"
+                    sh 'docker logout'
                 }
             }
         }
