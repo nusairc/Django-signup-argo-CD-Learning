@@ -4,8 +4,7 @@ pipeline {
         ECR_REPOSITORY = '947437598996.dkr.ecr.us-east-1.amazonaws.com/signup-chart'
         DOCKER_TAG = 'latest'
         HELM_CHART_DIR = 'signup-chart'
-            }
-
+                }
         stage('Set AWS Credentials') {
             steps {
                 script {
@@ -19,9 +18,7 @@ pipeline {
             steps {
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-key', url: 'https://github.com/nusairc/signup-argo.git']])
             }
-        }
-
-            
+        }  
         stage('Docker Login and Build') {
             steps {
                withCredentials([usernamePassword(credentialsId: 'docker-key', passwordVariable: 'docker-pass', usernameVariable: 'docker-user')]) {
@@ -59,10 +56,4 @@ pipeline {
             }
         }
 
-        
-        //  stage('pass buildnumber to another pipeline') {
-        //     steps {
-        //         build job: 'helm2-pipeline', parameters: [string(name: 'build_number', value: "${build_number}")]
-        //     }
-        // 
 }
