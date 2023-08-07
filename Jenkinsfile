@@ -7,33 +7,23 @@ pipeline {
             }
         }
         
-        stage('Docker Login and Build') {
+        // stage('Docker Login and Build') {
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker_pswd', usernameVariable: 'docker_uname')]) {
+        //             sh "docker login -u $docker_uname -p $docker_pswd"
+        //             sh "docker build -t nusair/signup-image:${env.BUILD_NUMBER} . "
+        //             sh "docker push nusair/signup-image:${env.BUILD_NUMBER}"
+        //             sh "docker logout"
+        //         }
+        //     }
+        // }
+
+        stage('helmChart tag') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker_pswd', usernameVariable: 'docker_uname')]) {
-                    sh "docker login -u $docker_uname -p $docker_pswd"
-                    sh "docker build -t nusair/signup-image:${env.BUILD_NUMBER} . "
-                    sh "docker push nusair/signup-image:${env.BUILD_NUMBER}"
-                    sh "docker logout"
-                }
+                sh "sed -i 's|nusair/signup-image:v1|947437598996.dkr.ecr.us-east-1.amazonaws.com/signup-chart:${env.BUILD_NUMBER}|g' signup-chart/values.yaml"
             }
         }
 
-        //  stage('Docker Login and Build') {
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker-pswd', usernameVariable: 'docker-uname')]) {
-        //     sh """
-        //         echo $docker-pswd | docker login -u $docker-uname --password-stdin
-        //         docker build -t nusair/signup-image:${env.BUILD_NUMBER} .
-        //         docker push nusair/signup-image:${env.BUILD_NUMBER}
-        //         docker logout
-        //     """
-        // }
-
-        // stage('helmChart tag') {
-        //     steps {
-        //         sh "sed -i 's|nusair/signup-image:v1|${ECR_REPOSITORY}:${DOCKER_TAG}|g' $HELM_CHART_DIR/values.yaml"
-        //     }
-        // }
         
         stage('helm package') {
             steps {
