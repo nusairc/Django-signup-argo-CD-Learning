@@ -6,7 +6,6 @@ pipeline {
         HELM_CHART_DIR = 'signup-chart'
     }
 
-    stages {
         stage('Set AWS Credentials') {
             steps {
                 script {
