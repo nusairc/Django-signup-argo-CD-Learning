@@ -1,13 +1,14 @@
 pipeline {
     agent any
 
-environment {
+    environment {
         AWS_ACCESS_KEY_ID = credentials('aws-key').accessKey
         AWS_SECRET_ACCESS_KEY = credentials('aws-key').secretKey
         ECR_REPOSITORY = '947437598996.dkr.ecr.us-east-1.amazonaws.com/signup-chart'
         DOCKER_TAG = 'latest'
         HELM_CHART_DIR = 'signup-chart'
     }
+
 
     // }
     stages {
