@@ -1,17 +1,21 @@
 pipeline {
     agent any
-
     environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-key').accessKey
-        AWS_SECRET_ACCESS_KEY = credentials('aws-key').secretKey
         ECR_REPOSITORY = '947437598996.dkr.ecr.us-east-1.amazonaws.com/signup-chart'
         DOCKER_TAG = 'latest'
         HELM_CHART_DIR = 'signup-chart'
     }
 
-
-    // }
     stages {
+        stage('Set AWS Credentials') {
+            steps {
+                script {
+                    def awsCreds = credentials('aws-key')
+                    env.AWS_ACCESS_KEY_ID = awsCreds.accessKey
+                    env.AWS_SECRET_ACCESS_KEY = awsCreds.secretKey
+                }
+            }
+        }
         stage('Checkout') {
             steps {
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-key', url: 'https://github.com/nusairc/signup-argo.git']])
@@ -55,9 +59,6 @@ pipeline {
                 }
             }
         }
-
-
-
 
         
         //  stage('pass buildnumber to another pipeline') {
