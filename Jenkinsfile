@@ -6,16 +6,29 @@ pipeline {
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'git-key', url: 'https://github.com/nusairc/signup-argo.git']])
             }
         }
+        
         stage('Docker Login and Build') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker-pswd', usernameVariable: 'docker-uname')]) {
-                    sh "docker login -u $docker-uname -p $docker-pswd"
+                withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker_pswd', usernameVariable: 'docker_uname')]) {
+                    sh "docker login -u $docker_uname -p $docker_pswd"
                     sh "docker build -t nusair/signup-image:${env.BUILD_NUMBER} . "
                     sh "docker push nusair/signup-image:${env.BUILD_NUMBER}"
                     sh "docker logout"
                 }
             }
         }
+
+        //  stage('Docker Login and Build') {
+        //     steps {
+        //         withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker-pswd', usernameVariable: 'docker-uname')]) {
+        //     sh """
+        //         echo $docker-pswd | docker login -u $docker-uname --password-stdin
+        //         docker build -t nusair/signup-image:${env.BUILD_NUMBER} .
+        //         docker push nusair/signup-image:${env.BUILD_NUMBER}
+        //         docker logout
+        //     """
+        // }
+
         // stage('helmChart tag') {
         //     steps {
         //         sh "sed -i 's|nusair/signup-image:v1|${ECR_REPOSITORY}:${DOCKER_TAG}|g' $HELM_CHART_DIR/values.yaml"
