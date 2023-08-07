@@ -4,7 +4,7 @@ pipeline {
         ECR_REPOSITORY = '947437598996.dkr.ecr.us-east-1.amazonaws.com/signup-chart'
         DOCKER_TAG = 'latest'
         HELM_CHART_DIR = 'signup-chart'
-    }
+            }
 
         stage('Set AWS Credentials') {
             steps {
@@ -64,6 +64,5 @@ pipeline {
         //     steps {
         //         build job: 'helm2-pipeline', parameters: [string(name: 'build_number', value: "${build_number}")]
         //     }
-        // }
-    }
+        // 
 }
