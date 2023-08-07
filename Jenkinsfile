@@ -8,8 +8,8 @@ pipeline {
         }
         stage('Docker Login and Build') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker-key', passwordVariable: 'docker-pass', usernameVariable: 'docker-user')]) {
-                    sh 'docker login -u $docker-user -p $docker-pass'
+                withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker-pswd', usernameVariable: 'docker-uname')]) {
+                    sh 'docker login -u $docker-uname -p $docker-pswd'
                     sh "docker build -t nusair/signup-image:${env.BUILD_NUMBER} . "
                     sh "docker push nusair/signup-image:${env.BUILD_NUMBER}"
                     sh 'docker logout'
