@@ -46,12 +46,13 @@ environment {
             steps {
                 withAWS(credentials: 'aws-key', region: 'us-east-1') {
                     sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 947437598996.dkr.ecr.us-east-1.amazonaws.com"
-                    sh "helm registry login -u AWS -p $$(aws ecr get-login-password --region us-east-1) 947437598996.dkr.ecr.us-east-1.amazonaws.com"
+                    sh "helm registry login -u AWS -p $(aws ecr get-login-password --region us-east-1) 947437598996.dkr.ecr.us-east-1.amazonaws.com"
                     sh "helm push $HELM_CHART_DIR-0.1.0.tgz oci://947437598996.dkr.ecr.us-east-1.amazonaws.com"
                     sh "rm $HELM_CHART_DIR-0.1.0.tgz"
                 }
             }
         }
+
 
 
 
