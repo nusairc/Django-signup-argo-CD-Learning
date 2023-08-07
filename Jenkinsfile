@@ -1,20 +1,10 @@
 pipeline {
     agent any
-    // environment {
-    //     build_number = "${env.BUILD_ID}"
-    //     AWS_ACCOUNT_ID="947437598996"
-    //     AWS_DEFAULT_REGION="us-east-1"
-    //     IMAGE_REPO_NAME="signup-chart"
-    //     IMAGE_TAG="latest"
-    //     REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
-    //{
-    // some block
-}
 
 environment {
         AWS_ACCESS_KEY_ID = credentials('aws-key').accessKey
         AWS_SECRET_ACCESS_KEY = credentials('aws-key').secretKey
-        ECR_REPOSITORY = 'your-ecr-repository-url'
+        ECR_REPOSITORY = '947437598996.dkr.ecr.us-east-1.amazonaws.com/signup-chart'
         DOCKER_TAG = 'latest'
         HELM_CHART_DIR = 'signup-chart'
     }
@@ -55,7 +45,8 @@ environment {
         stage('Logging into AWS ECR & push helm chart to ECR') {
             steps {
                 withAWS(credentials: 'aws-key', region: 'us-east-1') {
-                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_REPOSITORY"
+                    //sh 'aws ecr get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin 409486179793.dkr.ecr.us-east-1.amazonaws.com'  
+                    sh "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 947437598996.dkr.ecr.us-east-1.amazonaws.com"
                     sh "helm registry login -u AWS -p $(aws ecr get-login-password --region us-east-1) 947437598996.dkr.ecr.us-east-1.amazonaws.com"
                     sh "helm push $HELM_CHART_DIR-0.1.0.tgz oci://947437598996.dkr.ecr.us-east-1.amazonaws.com"
                     sh "rm $HELM_CHART_DIR-0.1.0.tgz"
@@ -63,18 +54,6 @@ environment {
             }
         }
 
-       
-        stage('Logging into AWS ECR & push helm chart to ECR') {
-            steps {
-                withCredentials([aws(credentialsId: 'aws-key', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    script {
-                        bat '"C:\\Program Files\\Amazon\\AWSCLIV2\\aws" ecr get-login-password --region us-east-1 | "C:\\Program Files\\windows-amd64\\helm" registry login --username AWS --password-stdin 947437598996.dkr.ecr.us-east-1.amazonaws.com'
-                        bat "\"C:\\Program Files\\windows-amd64\\helm\" push signup-chart-0.1.0.tgz oci://947437598996.dkr.ecr.us-east-1.amazonaws.com"
-                        bat "del signup-chart-0.1.0.tgz"
-                    }
-                }
-            }
-        }
 
         
          stage('pass buildnumber to another pipeline') {
