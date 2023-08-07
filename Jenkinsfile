@@ -16,7 +16,6 @@ pipeline {
                 }
             }
         }
-        
         // stage('helmChart tag') {
         //     steps {
         //         sh "sed -i 's|nusair/signup-image:v1|${ECR_REPOSITORY}:${DOCKER_TAG}|g' $HELM_CHART_DIR/values.yaml"
