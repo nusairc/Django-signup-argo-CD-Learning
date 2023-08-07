@@ -56,10 +56,10 @@ environment {
 
 
         
-         stage('pass buildnumber to another pipeline') {
-            steps {
-                build job: 'helm2-pipeline', parameters: [string(name: 'build_number', value: "${build_number}")]
-            }
-        }
+        //  stage('pass buildnumber to another pipeline') {
+        //     steps {
+        //         build job: 'helm2-pipeline', parameters: [string(name: 'build_number', value: "${build_number}")]
+        //     }
+        // }
     }
 }
