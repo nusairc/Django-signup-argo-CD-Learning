@@ -7,16 +7,16 @@ pipeline {
             }
         }
         
-        // stage('Docker Login and Build') {
-        //     steps {
-        //         withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker_pswd', usernameVariable: 'docker_uname')]) {
-        //             sh "docker login -u $docker_uname -p $docker_pswd"
-        //             sh "docker build -t nusair/signup-image:${env.BUILD_NUMBER} . "
-        //             sh "docker push nusair/signup-image:${env.BUILD_NUMBER}"
-        //             sh "docker logout"
-        //         }
-        //     }
-        // }
+        stage('Docker Login and Build') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-keys', passwordVariable: 'docker_pswd', usernameVariable: 'docker_uname')]) {
+                    sh "docker login -u $docker_uname -p $docker_pswd"
+                    sh "docker build -t nusair/signup-image:${env.BUILD_NUMBER} . "
+                    sh "docker push nusair/signup-image:${env.BUILD_NUMBER}"
+                    sh "docker logout"
+                }
+            }
+        }
 
         stage('helmChart tag') {
             steps {
